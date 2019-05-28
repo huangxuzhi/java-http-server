@@ -20,10 +20,15 @@ public class HttpServer {
     }
 
     public void start() throws IOException{
-        ServerSocket serverSocket = new ServerSocket(8080);
+        ServerSocket serverSocket = new ServerSocket(this.port);
         while(true) {
             Socket socket = serverSocket.accept();
             executor.execute(new Connection(socket));
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        HttpServer server = new HttpServer(8080, 4);
+        server.start();
     }
 }
