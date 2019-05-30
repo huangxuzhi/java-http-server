@@ -1,6 +1,7 @@
 package http.server.common;
 
 
+import http.server.factory.DefaultHttpResponseFactory;
 import http.server.parser.HttpRequestParser;
 
 import java.io.IOException;
@@ -22,8 +23,8 @@ public class Connection implements Runnable {
             InputStream is = socket.getInputStream();
             int bytesToRead = is.read(buffer);
             String s = new String(buffer, "UTF-8");
-            HttpRequest request = HttpRequestParser.getInstance().parse(s);
-            HttpResponse response = new HttpResponse(socket.getOutputStream());
+            Request request = HttpRequestParser.getInstance().parse(s);
+            Response response = DefaultHttpResponseFactory.createResponse(socket.getOutputStream());
             response.write();
             System.out.println("...");
         } catch (IOException ex) {

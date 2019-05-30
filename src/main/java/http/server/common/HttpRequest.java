@@ -2,8 +2,7 @@ package http.server.common;
 
 import java.util.Map;
 
-public class HttpRequest {
-    public static final String HTTP_VERSION = "HTTP/1.1";
+public class HttpRequest implements Request{
     private String method;
     private String uri;
     private String httpVersion;
