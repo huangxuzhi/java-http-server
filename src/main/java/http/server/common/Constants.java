@@ -3,7 +3,7 @@ package http.server.common;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommonConstants {
+public class Constants {
 
     public static final String SERVER_NAME = "Crystal";
 
@@ -11,5 +11,6 @@ public class CommonConstants {
 
     static {
         DEFAULT_RESPONSE_HEADERS.put("Server", SERVER_NAME);
+        DEFAULT_RESPONSE_HEADERS.put("Connection", "close");
     }
 }

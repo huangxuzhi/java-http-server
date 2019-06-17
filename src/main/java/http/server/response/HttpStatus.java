@@ -1,4 +1,4 @@
-package http.server.common;
+package http.server.response;
 
 
 import com.sun.tools.corba.se.idl.constExpr.Not;

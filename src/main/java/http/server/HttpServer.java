@@ -1,6 +1,6 @@
 package http.server;
 
-import http.server.common.Connection;
+import http.server.request.Connection;
 
 import java.io.IOException;
 import java.net.ServerSocket;

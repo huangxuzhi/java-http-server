@@ -1,4 +1,6 @@
-package http.server.common;
+package http.server.request;
+
+import http.server.request.body.RequestBody;
 
 import java.util.Map;
 
@@ -8,7 +10,7 @@ public class HttpRequest implements Request{
     private String httpVersion;
     private Map<String,String> headers;
     private Map<String,String> parameters;
-    private String body;
+    private RequestBody body;
 
     public String getMethod() {
         return method;
@@ -48,13 +50,5 @@ public class HttpRequest implements Request{
 
     public void setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
     }
 }

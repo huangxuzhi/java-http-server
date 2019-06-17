@@ -1,4 +1,7 @@
-package http.server.common;
+package http.server.response;
+
+import http.server.common.Constants;
+import http.server.request.Request;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +32,7 @@ public class HttpResponse implements Response{
         if (httpStatus == null || headers == null || headers.size() <= 0) {
             httpStatus = HttpStatus.Internal_Server_Error;
             body = INTERNAL_SERVER_ERROR_MSG;
-            headers = CommonConstants.DEFAULT_RESPONSE_HEADERS;
+            headers = Constants.DEFAULT_RESPONSE_HEADERS;
         }
         StringBuilder sb = new StringBuilder(1500);
         sb.append(httpVersion).append(" ").append(httpStatus.getCode()).append(" ").append(httpStatus.getStatus()).append("\r\n");

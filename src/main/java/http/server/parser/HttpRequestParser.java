@@ -1,29 +1,36 @@
 package http.server.parser;
 
-import http.server.common.HttpRequest;
+import http.server.request.HttpRequest;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpRequestParser implements Parser<HttpRequest> {
+public class HttpRequestParser implements Parser<InputStream, HttpRequest> {
 
-    private HttpRequestParser(){}
+    public static final String DEFAULT_CHARSET = "UTF-8";
 
-    public static HttpRequestParser instance = new HttpRequestParser();
+    private String charset;
 
-    public static HttpRequestParser getInstance() {
-        return instance;
+    private HttpRequestParser(String charset){
+        this.charset = charset;
     }
 
     @Override
-    public HttpRequest parse(String s) {
+    public HttpRequest parse(InputStream is) throws IOException {
         HttpRequest request = new HttpRequest();
-        String requestLine = s.substring(0, s.indexOf("\r\n"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String requestLine = reader.readLine();
         parseRequestLine(requestLine, request);
-        String requestHeaders = s.substring(s.indexOf("\r\n") + 2, s.indexOf("\r\n\r\n"));
-        parseRequestHeader(requestHeaders, request);
-        String body = s.substring(s.indexOf("\r\n\r\n") + 4);
-        request.setBody(body);
+        String s;
+        while ((s = reader.readLine()) != null) {
+            if ("".equals(s)) break;
+            System.out.println(s);
+        }
+        System.out.println(is.available());
+        byte[] b = new byte[is.available()];
+        is.read(b);
+        System.out.println(new String(b));
         return request;
     }
 
@@ -64,4 +71,30 @@ public class HttpRequestParser implements Parser<HttpRequest> {
         }
         request.setHeaders(headers);
     }
+
+//    private int scanAndMarkEnd(byte[] b, int start, byte... bytesToStop) {
+//        for (int i = start, j = 0; i < b.length; i++, j++) {
+//            if (j >= bytesToStop.length) {
+//                int m = i, n = bytesToStop.length - 1;
+//                while (n >= 0) {
+//                    if (b[m] != bytesToStop[n]) {
+//                        break;
+//                    }
+//                    m--;
+//                    n--;
+//                }
+//                position.set(i);
+//                return m;
+//            }
+//        }
+//        return -1;
+//    }
+
+//    private String getStrFromBytes(byte[] b, byte... byteToStop) throws UnsupportedEncodingException {
+//        int start = position.get();
+//        int end = scanAndMarkEnd(b, start, byteToStop);
+//        byte[] bb = new byte[end - start + 1];
+//        System.arraycopy(b, start, bb, 0, bb.length);
+//        return new String(bb,charset);
+//    }
 }

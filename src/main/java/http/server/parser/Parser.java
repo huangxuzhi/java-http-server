@@ -1,6 +1,9 @@
 package http.server.parser;
 
-public interface Parser<T> {
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
-    T parse(String s);
+public interface Parser<T, S> {
+
+    S parse(T t) throws IOException;
 }

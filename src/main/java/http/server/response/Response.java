@@ -1,4 +1,4 @@
-package http.server.common;
+package http.server.response;
 
 import java.io.IOException;
 
