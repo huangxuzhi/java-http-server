@@ -1,9 +1,11 @@
 package http.server.request.body;
 
-public class UrlencodedRequestBody extends AbstractRequestBody {
+import java.io.InputStream;
 
-    public UrlencodedRequestBody() {
-        super(RequestBodyType.X_WWW_FORM_URLENCODED);
+public class UrlencodedRequestBody extends AbstractHttpRequestBody {
+
+    public UrlencodedRequestBody(InputStream is) {
+        super(RequestBodyType.X_WWW_FORM_URLENCODED, is);
     }
 
     @Override

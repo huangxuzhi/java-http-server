@@ -1,7 +1,8 @@
 package http.server.request;
 
-import http.server.request.body.RequestBody;
+import http.server.request.body.HttpRequestBody;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest implements Request{
@@ -10,7 +11,7 @@ public class HttpRequest implements Request{
     private String httpVersion;
     private Map<String,String> headers;
     private Map<String,String> parameters;
-    private RequestBody body;
+    private HttpRequestBody body;
 
     public String getMethod() {
         return method;
@@ -50,5 +51,20 @@ public class HttpRequest implements Request{
 
     public void setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
+    }
+
+    @Override
+    public void addParameter(String key, String val) {
+        if (parameters == null) {
+            parameters = new HashMap<>();
+        }
+        parameters.put(key, val);
+    }
+
+    public void addHeader(String key, String val) {
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
+        headers.put(key, val);
     }
 }

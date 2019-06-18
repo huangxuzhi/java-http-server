@@ -1,13 +1,23 @@
 package http.server.request.body;
 
-public class FileRequestBody extends AbstractRequestBody {
+import java.io.InputStream;
 
-    public FileRequestBody() {
-        super(RequestBodyType.FORM_DATA);
+public class FileRequestBody extends AbstractHttpRequestBody {
+
+
+
+    public FileRequestBody(InputStream is) {
+        super(RequestBodyType.FORM_DATA, is);
     }
 
     @Override
     public Object getContent() {
         return null;
     }
+
+    @Override
+    public void initContent() {
+
+    }
 }
+

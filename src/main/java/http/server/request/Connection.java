@@ -24,9 +24,11 @@ public class Connection implements Runnable {
             int available = is.available();
             if (available > 0) {
 //                byte[] b = new byte[available];
-//                int bytesToRead = is.read(b);
-//                String s = new String(b, "UTF-8");
+//                is.read(b);
+//                String s = new String(b);
 //                System.out.println(s);
+                StreamBuffer streamBuffer = new StreamBuffer(is);
+                streamBuffer.buildRequest();
                 Response response = DefaultHttpResponseFactory.createResponse(socket.getOutputStream());
                 response.write();
             }
