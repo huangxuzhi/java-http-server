@@ -53,6 +53,10 @@ public class HttpRequest implements Request{
         this.parameters = parameters;
     }
 
+    public void setBody(HttpRequestBody body) {
+        this.body = body;
+    }
+
     @Override
     public void addParameter(String key, String val) {
         if (parameters == null) {

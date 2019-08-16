@@ -1,100 +1,164 @@
 package http.server.parser;
 
+import http.server.common.Constants;
+import http.server.common.MIMEType;
+import http.server.exception.ContentTypeNotSupportedException;
 import http.server.request.HttpRequest;
+import http.server.request.body.FileRequestBody;
+import http.server.request.body.HttpRequestBody;
+import http.server.request.body.TextRequestBody;
+import http.server.request.body.UrlencodedRequestBody;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Map;
 
-public class HttpRequestParser implements Parser<InputStream, HttpRequest> {
+public class HttpRequestParser extends RequestParser<InputStream, HttpRequest> {
 
-    public static final String DEFAULT_CHARSET = "UTF-8";
+    private HttpRequest request;
 
-    private String charset;
-
-    private HttpRequestParser(String charset){
-        this.charset = charset;
+    public HttpRequestParser(InputStream is) {
+        super(is);
+        this.request = new HttpRequest();
     }
 
     @Override
-    public HttpRequest parse(InputStream is) throws IOException {
-        HttpRequest request = new HttpRequest();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        String requestLine = reader.readLine();
-        parseRequestLine(requestLine, request);
-        String s;
-        while ((s = reader.readLine()) != null) {
-            if ("".equals(s)) break;
-            System.out.println(s);
-        }
-        System.out.println(is.available());
-        byte[] b = new byte[is.available()];
-        is.read(b);
-        System.out.println(new String(b));
-        return request;
+    public HttpRequest parse() throws Exception {
+        parseRequestLine();
+        parseRequestHeaders();
+        parseRequestBody();
+        return getRequest();
     }
 
-    private void parseRequestLine(String requestLine, HttpRequest request) {
-        String[] arr = requestLine.split(" ");
-        request.setMethod(arr[0]);
-        String[] uriAndParameters = arr[1].split("\\?");
-        Map<String,String> params = new HashMap<>();
-        if (uriAndParameters.length > 1) {
-            String[] parameters = uriAndParameters[1].split("&");
-            for (int i = 0; i < parameters.length; i++) {
-                String[] keyAndValue = parameters[i].split("=");
-                if (keyAndValue.length > 1) {
-                    params.put(keyAndValue[0], keyAndValue[1]);
+    public HttpRequest getRequest() {
+        return this.request;
+    }
+
+    private void parseRequestLine() throws IOException {
+        char c;
+        boolean readingUri = true;
+        boolean readingKey = false;
+        boolean readingVal = false;
+        StringBuilder method = new StringBuilder(7);
+        StringBuilder uri = new StringBuilder(128);
+        StringBuilder version = new StringBuilder(16);
+        StringBuilder key = null;
+        StringBuilder val = null;
+
+        while ((c = (char)s.read()) != Constants.SP) {
+            method.append(c);
+        }
+        request.setMethod(method.toString());
+
+        while ((c = (char)s.read()) != Constants.SP) {
+            if (c == Constants.QUESTION) {
+                request.setUri(uri.toString());
+                readingKey = true;
+                readingUri = false;
+                continue;
+            }
+            if (c == Constants.EQ) {
+                readingKey = false;
+                readingVal = true;
+                continue;
+            }
+            if (c == Constants.AND) {
+                request.addParameter(key.toString(), val.toString());
+                key.delete(0, key.length());
+                val.delete(0, val.length());
+                readingKey = true;
+                readingVal = false;
+                continue;
+            }
+            if (readingUri) {
+                uri.append(c);
+            }
+            if (readingKey) {
+                if (key == null) {
+                    key = new StringBuilder(64);
                 }
+                key.append(c);
             }
-
-        }
-        request.setUri(uriAndParameters[0]);
-        request.setHttpVersion(arr[2]);
-    }
-
-    private void parseRequestHeader(String requestHeaders, HttpRequest request) {
-        Map<String,String> headers = new HashMap<>(30);
-        while (true) {
-            int idx = requestHeaders.indexOf("\r\n");
-            if (idx > 0) { // means next line exists
-                String h = requestHeaders.substring(0, idx);
-                String[] arr = h.split(":");
-                headers.put(arr[0], arr[1]);
-                requestHeaders = requestHeaders.substring(idx + 2);
-            } else { // it is the last line
-                String h = requestHeaders;
-                String[] arr = h.split(":");
-                headers.put(arr[0], arr[1]);
-                break;
+            if (readingVal) {
+                if (val == null) {
+                    val = new StringBuilder(64);
+                }
+                val.append(c);
             }
         }
-        request.setHeaders(headers);
+
+        while ((c = (char)s.read()) != Constants.CR) {
+            version.append(c);
+        }
+        request.setHttpVersion(version.toString());
+        s.skip(1);
     }
 
-//    private int scanAndMarkEnd(byte[] b, int start, byte... bytesToStop) {
-//        for (int i = start, j = 0; i < b.length; i++, j++) {
-//            if (j >= bytesToStop.length) {
-//                int m = i, n = bytesToStop.length - 1;
-//                while (n >= 0) {
-//                    if (b[m] != bytesToStop[n]) {
-//                        break;
-//                    }
-//                    m--;
-//                    n--;
-//                }
-//                position.set(i);
-//                return m;
-//            }
-//        }
-//        return -1;
-//    }
+    private void parseRequestHeaders() throws Exception {
+        char c;
+        boolean readingHeaderKey = true;
+        boolean readingHeaderVal = false;
+        boolean crlfAlready = false;
+        StringBuilder key = new StringBuilder(32);
+        StringBuilder val = new StringBuilder(32);
+        while ((c = (char)s.read()) != Constants.CR || !crlfAlready) {
+            if (crlfAlready) {
+                crlfAlready = false;
+            }
+            if(c == Constants.COLON && readingHeaderKey) {
+                readingHeaderKey = false;
+                readingHeaderVal = true;
+                continue;
+            }
+            if (c == Constants.CR) {
+                readingHeaderKey = true;
+                readingHeaderVal = false;
+                request.addHeader(key.toString().trim(), val.toString().trim());
+                key.delete(0,key.length());
+                val.delete(0, val.length());
+                s.skip(1);
+                crlfAlready = true;
+                continue;
+            }
+            if (readingHeaderKey) {
+                key.append(c);
+            }
+            if (readingHeaderVal) {
+                val.append(c);
+            }
+        }
+        s.skip(1);
+    }
 
-//    private String getStrFromBytes(byte[] b, byte... byteToStop) throws UnsupportedEncodingException {
-//        int start = position.get();
-//        int end = scanAndMarkEnd(b, start, byteToStop);
-//        byte[] bb = new byte[end - start + 1];
-//        System.arraycopy(b, start, bb, 0, bb.length);
-//        return new String(bb,charset);
-//    }
+    private void parseRequestBody() throws Exception {
+        Map<String,String> headers;
+        if ( (headers = request.getHeaders()) != null && headers.containsKey(Constants.CONTENT_TYPE)) {
+            String ct = null;
+            MIMEType type = null;
+            HttpRequestBody body = null;
+            try {
+                ct = headers.get(Constants.CONTENT_TYPE);
+                int semiColonIdx = ct.indexOf(Constants.SEMI_COLON);
+                type = MIMEType.getByTypeName(ct.substring(0, semiColonIdx > 0 ? semiColonIdx : ct.length()));
+            } catch (EnumConstantNotPresentException e) {
+                throw new ContentTypeNotSupportedException("Unable to address the '" + ct +"' content type");
+            }
+            switch (type) {
+                case PLAIN:
+                    body = new TextRequestBody(s);
+                    break;
+                case X_WWW_FORM_URLENCODED:
+                    body = new UrlencodedRequestBody(s);
+                    break;
+                case FORM_DATA:
+                    body = new FileRequestBody(s, ct.substring(ct.indexOf(Constants.BOUNDARY) + 10));
+                    break;
+                default:
+                    break;
+            }
+            if (body != null) {
+                body.initContent();
+                request.setBody(body);
+            }
+        }
+    }
 }

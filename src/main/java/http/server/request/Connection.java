@@ -1,6 +1,8 @@
 package http.server.request;
 
 
+import http.server.exception.ContentTypeNotSupportedException;
+import http.server.parser.RequestParser;
 import http.server.response.Response;
 import http.server.factory.DefaultHttpResponseFactory;
 import http.server.parser.HttpRequestParser;
@@ -27,14 +29,14 @@ public class Connection implements Runnable {
 //                is.read(b);
 //                String s = new String(b);
 //                System.out.println(s);
-                StreamBuffer streamBuffer = new StreamBuffer(is);
-                streamBuffer.buildRequest();
+                RequestParser p = new HttpRequestParser(is);
+                Request q = p.parse();
                 Response response = DefaultHttpResponseFactory.createResponse(socket.getOutputStream());
                 response.write();
             }
             socket.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

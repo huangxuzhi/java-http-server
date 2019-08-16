@@ -11,4 +11,16 @@ public enum MIMEType {
     MIMEType(String typeName) {
         this.typeName = typeName;
     }
+
+    public static MIMEType getByTypeName(String typeName) {
+        if (typeName == null || typeName.equals("")) {
+            return null;
+        }
+        for (MIMEType m : MIMEType.values()) {
+            if (m.typeName.equals(typeName)) {
+                return m;
+            }
+        }
+        return null;
+    }
 }

@@ -1,7 +1,6 @@
 package http.server.response;
 
 
-import com.sun.tools.corba.se.idl.constExpr.Not;
 
 public enum HttpStatus{
     Continue("100", "Continue"),
