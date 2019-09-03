@@ -18,7 +18,7 @@ public abstract class AbstractMultiPart implements MultiPart{
         if (idx < 0 && idx2 < 0) {
             throw new ParseRequestBodyException("No name defined for multipart");
         }
-        idx += 7;
+        idx +=6;
         int idx3 = contentDisposition.indexOf('\"', idx);
         name = contentDisposition.substring(idx, idx3);
     }

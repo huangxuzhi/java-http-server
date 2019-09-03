@@ -1,8 +1,10 @@
 package http.server.request;
 
 
+import http.server.common.Student;
 import http.server.exception.ContentTypeNotSupportedException;
 import http.server.parser.RequestParser;
+import http.server.request.body.JsonRequestBody;
 import http.server.response.Response;
 import http.server.factory.DefaultHttpResponseFactory;
 import http.server.parser.HttpRequestParser;
@@ -29,8 +31,9 @@ public class Connection implements Runnable {
 //                is.read(b);
 //                String s = new String(b);
 //                System.out.println(s);
-                RequestParser p = new HttpRequestParser(is);
-                Request q = p.parse();
+                HttpRequestParser p = new HttpRequestParser(is);
+                HttpRequest q = p.parse();
+                ((JsonRequestBody)q.getBody()).getContent(Student.class);
                 Response response = DefaultHttpResponseFactory.createResponse(socket.getOutputStream());
                 response.write();
             }

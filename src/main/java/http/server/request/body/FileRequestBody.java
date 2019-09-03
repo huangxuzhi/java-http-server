@@ -51,9 +51,8 @@ public class FileRequestBody extends AbstractHttpRequestBody {
 
                 Map<String,String> headers = new HashMap<>(8);
                 MultiPart part;
-                int start = pos + 1,end;
                 boolean readingKey = true, readingVal = false;
-                StringBuilder key = new StringBuilder(32);
+                StringBuilder key = new StringBuilder(32).append((char)buffer[pos - 2]).append((char)buffer[pos - 1]);
                 StringBuilder val = new StringBuilder(128);
                 while (true) {
                     b = read();
@@ -64,12 +63,12 @@ public class FileRequestBody extends AbstractHttpRequestBody {
                     }
                     if (b == (byte)Constants.CR) {
                         read();
+                        headers.put(key.toString().trim(), val.toString().trim());
                         if (ByteUtils.arrayEquals(CRLFX2, 0, buffer, pos - 3, 4)) {
                             break;
                         }
                         readingKey = true;
                         readingVal = false;
-                        headers.put(key.toString().trim(), val.toString().trim());
                         key.delete(0, key.length());
                         val.delete(0, val.length());
                         continue;
@@ -99,6 +98,7 @@ public class FileRequestBody extends AbstractHttpRequestBody {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ParseRequestBodyException(e);
         }
     }

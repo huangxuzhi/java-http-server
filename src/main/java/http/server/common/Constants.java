@@ -30,9 +30,17 @@ public class Constants {
 
     public static final char SEMI_COLON = ';';
 
+    public static final char COMMA = ',';
+
     public static final char CR =  '\r';
 
     public static final char LF =  '\n';
+
+    public static final char LB =  '{';
+
+    public static final char RB =  '}';
+
+    public static final char DQ =  '\"';
 
     public static final byte[] CRLF = {(byte)'\r', (byte)'\n'};
 

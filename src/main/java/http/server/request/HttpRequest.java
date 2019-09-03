@@ -57,6 +57,10 @@ public class HttpRequest implements Request{
         this.body = body;
     }
 
+    public HttpRequestBody getBody() {
+        return body;
+    }
+
     @Override
     public void addParameter(String key, String val) {
         if (parameters == null) {
