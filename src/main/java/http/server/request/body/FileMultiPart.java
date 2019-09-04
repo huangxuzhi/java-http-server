@@ -3,12 +3,12 @@ package http.server.request.body;
 import http.server.common.Constants;
 import http.server.exception.ParseRequestBodyException;
 
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Map;
 
 public class FileMultiPart extends AbstractMultiPart {
 
-    private OutputStream os;
+    private byte[] bytes;
 
     private String fileName;
 
@@ -25,7 +25,25 @@ public class FileMultiPart extends AbstractMultiPart {
 
     }
 
-    public void setOs(OutputStream os) {
-        this.os = os;
+    public void write(File f) throws IOException {
+        FileOutputStream fos = new FileOutputStream(f);
+        fos.write(bytes);
+        fos.flush();
+        fos.close();
+    }
+
+    public void write(String filePath) throws IOException {
+        FileOutputStream fos = new FileOutputStream(filePath);
+        fos.write(bytes);
+        fos.flush();
+        fos.close();
+    }
+
+    public byte[] getBytes() {
+        return this.bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
     }
 }

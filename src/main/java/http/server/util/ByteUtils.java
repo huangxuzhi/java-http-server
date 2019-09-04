@@ -8,8 +8,8 @@ public class ByteUtils {
         Assert.assertPositive(length, "Argument 'offset2' can not be negative");
         Assert.assertNotNull(b1,"byte array can not be null");
         Assert.assertNotNull(b2,"byte array can not be null");
-        int i = offset1,j = offset2;
-        for (;i < length && j < length && i < b1.length && j < b2.length; i++,j++) {
+        int i = offset1,j = offset2, k = 0;
+        for (;k < length && i < b1.length && j < b2.length; i++,j++,k++) {
             if (b1[i] != b2[j]) {
                 return false;
             }

@@ -147,7 +147,7 @@ public class HttpRequestParser extends RequestParser<InputStream, HttpRequest> {
                     body = new UrlencodedRequestBody(s);
                     break;
                 case FORM_DATA:
-                    body = new FileRequestBody(s, ct.substring(ct.indexOf(Constants.BOUNDARY) + 10));
+                    body = new FileRequestBody(s, ct.substring(ct.indexOf(Constants.BOUNDARY) + 9));
                     break;
                 case JSON:
                     body = new JsonRequestBody(s);

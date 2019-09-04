@@ -4,11 +4,10 @@ import http.server.common.Constants;
 import http.server.exception.ParseRequestBodyException;
 import http.server.util.ByteUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static http.server.common.Constants.CRLFX2;
@@ -21,10 +20,13 @@ public class FileRequestBody extends AbstractHttpRequestBody {
 
     private int pos = 0;
 
+    private List<MultiPart> parts;
+
     public FileRequestBody(InputStream is, String boundary) throws IOException {
         super(RequestBodyType.FORM_DATA, is);
         this.boundary = boundary.getBytes();
         this.buffer = new byte[is.available()];
+        parts = new ArrayList<>();
     }
 
     @Override
@@ -63,8 +65,10 @@ public class FileRequestBody extends AbstractHttpRequestBody {
                     }
                     if (b == (byte)Constants.CR) {
                         read();
-                        headers.put(key.toString().trim(), val.toString().trim());
-                        if (ByteUtils.arrayEquals(CRLFX2, 0, buffer, pos - 3, 4)) {
+                        if (key.length() > 0) {
+                            headers.put(key.toString().trim(), val.toString().trim());
+                        }
+                        if (ByteUtils.arrayEquals(CRLFX2, 0, buffer, pos - 4, 4)) {
                             break;
                         }
                         readingKey = true;
@@ -85,15 +89,13 @@ public class FileRequestBody extends AbstractHttpRequestBody {
                 if (contentDispositon.contains(Constants.FILENAME)) {
                     part = new FileMultiPart(headers);
                     byte[] c = getContentForPart();
-                    OutputStream os = new ByteArrayOutputStream();
-                    os.write(c);
-                    ((FileMultiPart) part).setOs(os);
+                    ((FileMultiPart) part).setBytes(c);
                 } else {
                     part = new FieldMultipart(headers);
                     byte[] c = getContentForPart();
                     ((FieldMultipart) part).setValue(new String(c));
                 }
-
+                parts.add(part);
 
             }
 
@@ -125,11 +127,11 @@ public class FileRequestBody extends AbstractHttpRequestBody {
     }
 
     private byte[] getContentForPart() throws IOException {
-        int posT = pos + 1;
-        while (!ByteUtils.arrayEquals(boundary, 0, buffer, pos - boundary.length + 1, boundary.length)) {
+        int posT = pos;
+        while (!ByteUtils.arrayEquals(boundary, 0, buffer, pos - boundary.length, boundary.length)) {
             read();
         }
-        byte[] b = new byte[pos - boundary.length - posT + 3];
+        byte[] b = new byte[pos - boundary.length - posT - 4];
         System.arraycopy(buffer, posT, b, 0, b.length);
         return b;
     }
