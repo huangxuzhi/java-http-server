@@ -45,7 +45,6 @@ public class HttpRequestParser extends RequestParser<InputStream, HttpRequest> {
             method.append(c);
         }
         request.setMethod(method.toString());
-
         while ((c = (char)s.read()) != Constants.SP) {
             if (c == Constants.QUESTION) {
                 request.setUri(uri.toString());
@@ -82,7 +81,7 @@ public class HttpRequestParser extends RequestParser<InputStream, HttpRequest> {
                 val.append(c);
             }
         }
-
+        request.setUri(uri.toString());
         while ((c = (char)s.read()) != Constants.CR) {
             version.append(c);
         }

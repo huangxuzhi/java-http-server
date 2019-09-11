@@ -5,12 +5,12 @@ import http.server.exception.ParseRequestBodyException;
 
 import java.util.Map;
 
-public abstract class AbstractMultiPart implements MultiPart{
+public abstract class AbstractPart implements Part {
     protected Map<String,String> headers;
 
     protected String name;
 
-    public AbstractMultiPart(Map<String, String> headers) throws ParseRequestBodyException {
+    public AbstractPart(Map<String, String> headers) throws ParseRequestBodyException {
         this.headers = headers;
         String contentDisposition = headers.get(Constants.CONTENT_DISPOSITION);
         int idx = contentDisposition.indexOf("name=\"");

@@ -6,13 +6,13 @@ import http.server.exception.ParseRequestBodyException;
 import java.io.*;
 import java.util.Map;
 
-public class FileMultiPart extends AbstractMultiPart {
+public class FilePart extends AbstractPart {
 
     private byte[] bytes;
 
     private String fileName;
 
-    public FileMultiPart(Map<String, String> headers) throws ParseRequestBodyException {
+    public FilePart(Map<String, String> headers) throws ParseRequestBodyException {
         super(headers);
         String contentDisposition = headers.get(Constants.CONTENT_DISPOSITION);
         int idx = contentDisposition.indexOf("filename=\"");

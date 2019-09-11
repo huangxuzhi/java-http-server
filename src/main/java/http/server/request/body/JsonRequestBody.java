@@ -17,7 +17,7 @@ public class JsonRequestBody extends AbstractHttpRequestBody {
 
     @Override
     public Object getContent() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

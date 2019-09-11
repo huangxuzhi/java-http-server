@@ -4,11 +4,11 @@ import http.server.exception.ParseRequestBodyException;
 
 import java.util.Map;
 
-public class FieldMultipart extends AbstractMultiPart {
+public class FieldPart extends AbstractPart {
 
     private String value;
 
-    public FieldMultipart(Map<String, String> headers) throws ParseRequestBodyException {
+    public FieldPart(Map<String, String> headers) throws ParseRequestBodyException {
         super(headers);
     }
 
