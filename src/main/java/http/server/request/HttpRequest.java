@@ -41,6 +41,14 @@ public class HttpRequest implements Request{
         return headers;
     }
 
+    public String getHeader(String name) {
+        String header = null;
+        if (headers != null) {
+            header = headers.get(name);
+        }
+        return header;
+    }
+
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }

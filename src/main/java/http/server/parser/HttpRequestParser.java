@@ -58,11 +58,13 @@ public class HttpRequestParser extends RequestParser<InputStream, HttpRequest> {
                 continue;
             }
             if (c == Constants.AND) {
-                request.addParameter(key.toString(), val.toString());
-                key.delete(0, key.length());
-                val.delete(0, val.length());
-                readingKey = true;
-                readingVal = false;
+                if (key != null && key.length() > 0 && val != null && val.length() > 0) {
+                    request.addParameter(key.toString(), val.toString());
+                    key.delete(0, key.length());
+                    val.delete(0, val.length());
+                    readingKey = true;
+                    readingVal = false;
+                }
                 continue;
             }
             if (readingUri) {
@@ -82,6 +84,11 @@ public class HttpRequestParser extends RequestParser<InputStream, HttpRequest> {
             }
         }
         request.setUri(uri.toString());
+
+        if (key != null && key.length() > 0 && val != null && val.length() > 0) {
+            request.addParameter(key.toString(), val.toString());
+        }
+
         while ((c = (char)s.read()) != Constants.CR) {
             version.append(c);
         }
